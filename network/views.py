@@ -77,3 +77,19 @@ def newpost(request):
             Post.objects.create(user = current_user,
                                 content = content)
     return redirect('index')
+
+
+def userprofile(request):
+    current_user = request.user
+    try:
+        follows = current_user.user_profile.follows
+        followers = current_user.user_profile.followers
+        number_of_followers = len(followers)
+        number_of_follows = len(follows)
+    except:
+        number_of_followers = 0
+        number_of_follows = 0
+    return render(request, "network/userprofile.html", {
+        "number_of_followers": number_of_followers,
+        "number_of_follows": number_of_follows
+    })
