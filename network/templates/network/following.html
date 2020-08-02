@@ -1,0 +1,14 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    {% for post in posts %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title"><a href="{% url 'userprofile' post.user.id %}">{{post.user}}</a></h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{post.date_added}}</h6>
+            <p class="card-text">{{post.content}}</p>
+        </div>
+    </div>
+    <br>
+    {% endfor %}
+{% endblock %}

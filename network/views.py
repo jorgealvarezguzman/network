@@ -3,6 +3,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 from .models import *
 
@@ -120,3 +121,16 @@ def followuser(request, user_id):
     # follow user
     user_profile.followers.add(current_user_profile)
     return redirect('userprofile', user_id)
+
+
+@login_required
+def following(request):
+    current_user = request.user
+    follows = current_user.user_profile.follows.all()
+    # Create list with posts of all users that is following
+    posts = [post for user_profile in follows
+            for post in user_profile.user.posts.all()]
+    posts.sort(key=lambda post: post.date_added)
+    return render(request, "network/following.html",{
+        "posts": [post for post in posts[::-1]]
+    })
