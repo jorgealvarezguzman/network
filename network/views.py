@@ -84,18 +84,24 @@ def userprofile(request, user_id):
     current_user = request.user
     try:
         user_profile, created = UserProfile.objects.get_or_create(user=user)
+        current_user_profile, created = UserProfile.objects.get_or_create(user=current_user)
         number_of_followers = len(user_profile.followers.all())
         number_of_follows = len(user_profile.follows.all())
     except:
         number_of_followers = 0
         number_of_follows = 0
     posts = user.posts.all()
+    # Check if current user is a follower of user
+    is_follower = False
+    if user_profile.followers.filter(pk=current_user.user_profile.id).exists():
+        is_follower = True
     return render(request, "network/userprofile.html", {
         "number_of_followers": number_of_followers,
         "number_of_follows": number_of_follows,
         "posts": [post for post in posts[::-1]],
         "user": user,
-        "current_user": current_user
+        "current_user": current_user,
+        "is_follower": is_follower
     })
 
 
@@ -105,6 +111,12 @@ def followuser(request, user_id):
     # get or create profiles
     user_profile, created = UserProfile.objects.get_or_create(user=user)
     current_user_profile, created = UserProfile.objects.get_or_create(user=current_user)
+    # check if current user is follower of user
+    is_follower = user_profile.followers.filter(pk=current_user_profile.id).exists()
+    if is_follower:
+        # unfollow user
+        user_profile.followers.remove(current_user_profile)
+        return redirect('userprofile', user_id)
     # follow user
     user_profile.followers.add(current_user_profile)
     return redirect('userprofile', user_id)
