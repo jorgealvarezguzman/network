@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from .models import User, Post
+from .models import *
 
 from .forms import NewPostForm
 
@@ -79,17 +79,32 @@ def newpost(request):
     return redirect('index')
 
 
-def userprofile(request):
+def userprofile(request, user_id):
+    user = User.objects.get(id=user_id)
     current_user = request.user
     try:
-        follows = current_user.user_profile.follows
-        followers = current_user.user_profile.followers
-        number_of_followers = len(followers)
-        number_of_follows = len(follows)
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        number_of_followers = len(user_profile.followers.all())
+        number_of_follows = len(user_profile.follows.all())
     except:
         number_of_followers = 0
         number_of_follows = 0
+    posts = user.posts.all()
     return render(request, "network/userprofile.html", {
         "number_of_followers": number_of_followers,
-        "number_of_follows": number_of_follows
+        "number_of_follows": number_of_follows,
+        "posts": [post for post in posts[::-1]],
+        "user": user,
+        "current_user": current_user
     })
+
+
+def followuser(request, user_id):
+    user = User.objects.get(id=user_id)
+    current_user = request.user
+    # get or create profiles
+    user_profile, created = UserProfile.objects.get_or_create(user=user)
+    current_user_profile, created = UserProfile.objects.get_or_create(user=current_user)
+    # follow user
+    user_profile.followers.add(current_user_profile)
+    return redirect('userprofile', user_id)
