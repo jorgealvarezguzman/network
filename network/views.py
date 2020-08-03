@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 from .models import *
 
@@ -12,8 +13,12 @@ from .forms import NewPostForm
 
 def index(request):
     posts = Post.objects.all()
+    posts = [post for post in posts[::-1]]
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     return render(request, "network/index.html",{
-        "posts": [post for post in posts[::-1]]
+        "page_obj": page_obj
     })
 
 
@@ -92,6 +97,11 @@ def userprofile(request, user_id):
         number_of_followers = 0
         number_of_follows = 0
     posts = user.posts.all()
+    posts = [post for post in posts[::-1]]
+    # paginator
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     # Check if current user is a follower of user
     is_follower = False
     if user_profile.followers.filter(pk=current_user.user_profile.id).exists():
@@ -99,7 +109,7 @@ def userprofile(request, user_id):
     return render(request, "network/userprofile.html", {
         "number_of_followers": number_of_followers,
         "number_of_follows": number_of_follows,
-        "posts": [post for post in posts[::-1]],
+        "page_obj": page_obj,
         "user": user,
         "current_user": current_user,
         "is_follower": is_follower
@@ -131,6 +141,11 @@ def following(request):
     posts = [post for user_profile in follows
             for post in user_profile.user.posts.all()]
     posts.sort(key=lambda post: post.date_added)
+    posts = [post for post in posts[::-1]]
+    # paginator
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     return render(request, "network/following.html",{
-        "posts": [post for post in posts[::-1]]
+        "page_obj": page_obj
     })
