@@ -163,3 +163,14 @@ def updatepost(request):
         post.save()
 
     return HttpResponse("Life is good.")
+
+
+@login_required
+def likepost(request, post_id):
+    post = Post.objects.get(id=post_id)
+    current_user = request.user
+    like, created = Like.objects.get_or_create(user=current_user, post=post)
+    # check if current_user already likes post
+    if not created:
+        post.likes.filter(pk=like.id).delete()
+    return redirect('index')
