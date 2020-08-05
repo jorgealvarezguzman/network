@@ -5,10 +5,13 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import *
 
 from .forms import NewPostForm
+
+import json
 
 
 def index(request):
@@ -149,3 +152,14 @@ def following(request):
     return render(request, "network/following.html",{
         "page_obj": page_obj
     })
+
+
+@csrf_exempt
+def updatepost(request):
+    if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        post = Post.objects.get(id=data["post_id"])
+        post.content = data["content"]
+        post.save()
+
+    return HttpResponse("Life is good.")

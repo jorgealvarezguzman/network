@@ -13,9 +13,13 @@
     {% for post in page_obj %}
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title"><a href="{% url 'userprofile' post.user.id %}">{{post.user}}</a></h5>
+            <h5 class="card-title"><a href="{% url 'userprofile' post.user.id %}">{{post.user}}</a>
+            {% if user == post.user %}
+            <button class="badge badge-secondary" onclick="createTextarea('{{post.id}}', '{{post.content}}')">Edit</button>
+            {% endif %}
+            </h5>
             <h6 class="card-subtitle mb-2 text-muted">{{post.date_added}}</h6>
-            <p class="card-text">{{post.content}}</p>
+            <p class="card-text"><div id="{{post.id}}">{{post.content}}</div></p>
         </div>
     </div>
     <br>
