@@ -15,7 +15,7 @@
         <div class="card-body">
             <h5 class="card-title"><a href="{% url 'userprofile' post.user.id %}">{{post.user}}</a>
             {% if user == post.user %}
-            <a href="#" class="badge badge-secondary">Edit</a>
+            <button class="badge badge-secondary" onclick="createTextarea('{{post.id}}', '{{post.content}}')">Edit</button>
             {% endif %}
             </h5>
             <h6 class="card-subtitle mb-2 text-muted">{{post.date_added}}</h6>
