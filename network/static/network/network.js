@@ -34,3 +34,16 @@ function fetchHtml(id) {
           });
     });
 }
+
+function fetchLikes(post_id){
+    fetch(`http://127.0.0.1:8000/likepost/${post_id}`)
+    .then(function(response){
+        return response.text();
+    })
+    .then(function(html){
+        document.body.innerHTML = html;
+    })
+    .catch(function(err) {
+        location.reload();
+    });
+}

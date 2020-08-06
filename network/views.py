@@ -173,4 +173,8 @@ def likepost(request, post_id):
     # check if current_user already likes post
     if not created:
         post.likes.filter(pk=like.id).delete()
-    return redirect('index')
+    # if it is on a page other than the first
+    if request.GET.get('page', 1) > 1:
+        return redirect(request.resolver_match.url_name + '?page=%s' % paginator.num_pages)
+
+    return redirect(request.path_info)
